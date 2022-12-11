@@ -205,7 +205,7 @@ for (k in c("small", "medium", "large")) {
     }
 }
 
-result_tab %<>% slice(-1) %>% mutate(bias = abs(trueATE - estATE)/trueATE*100)
+result_tab %<>% slice(-1) %>% mutate(bias = abs(trueATE - estATE)*100)
 
 result_tab %>% group_by(scenario, method) %>%
     summarise(trueATE_m = mean(trueATE),
