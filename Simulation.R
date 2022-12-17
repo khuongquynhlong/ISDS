@@ -319,22 +319,35 @@ for (k in c("small", "medium", "large", "large2")) {
 }
 
 result_tab1 <- result_tab %>% slice(-1) %>% mutate(biasATE = abs(trueATE - estATE),
-                                     max_biasATE = abs(trueATE - max_biasATE),
+                                     bias_maxATE = abs(trueATE - max_biasATE),
                                      biasRR = abs(trueRR/estRR),
-                                     max_biasRR = abs(trueRR/max_biasRR))
+                                     bias_maxRR = abs(trueRR/max_biasRR))
 
 
-result_tab %>% group_by(scenario, method) %>%
+result_tab1 %<>% group_by(scenario, method) %>%
     summarise(trueATE_m = mean(trueATE),
               estATE_m = mean(estATE),
               biasATE_m = mean(biasATE),
-              max_biasATE_m = mean(max_biasATE),
+              max_bias_estATE_m = mean(max_biasATE),
+              bias_maxATE_m = mean(bias_maxATE),
               trueRR_m = mean(trueRR),
               estRR_m = mean(estRR),
               biasRR_m = mean(biasRR),
-              max_biasRR_m = mean(max_biasRR)) %>% ungroup() %>%
-    mutate(scenario = factor(scenario, levels = c("small", "medium", "large", "large2"))) %>%
-    knitr::kable()
+              max_bias_estRR_m = mean(max_biasRR),
+              bias_maxRR_m = mean(bias_maxRR)) %>% ungroup() %>%
+    mutate(scenario = factor(scenario, levels = c("small", "medium", "large", "large2")))
+
+
+# Table for ATE
+tab1 <- result_tab1 %>% select(scenario, method, trueATE_m, max_bias_estATE_m,
+                               bias_maxATE_m, estATE_m, biasATE_m)
+
+# Table for RR
+tab2 <- result_tab1 %>% select(scenario, method, trueRR_m, max_bias_estRR_m, 
+                               bias_maxRR_m, estRR_m, biasRR_m)
+
+library(xtable)
+xtable(tab1, digits = 5)
 
 
 #---------- Visualization
