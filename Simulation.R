@@ -1,29 +1,19 @@
+#===============================================================================
+# R code for Assignment of Iference for Statistics and Data Science course
+# Estimating Average Treatment Effect in Observational Studies: A Simulation
+# Comparing Methods in Addressing Confounding for Binary Outcomes
+#
+# Last update December 19, 2022
+#===============================================================================
+
 library(tidyverse)
 library(magrittr)
-library(boot)
-library(stdReg)
+# library(boot)
+# library(stdReg)
 library(survey)
 
 #---------- Simulation set up
 #===============================================================================
-
-# U ∼ N (1, 1)
-# X1 ∼ Bin(n, px1); with: logit(px1) = −2 + 0.25∗U
-# X2 = 1 + 0.5∗U + εx2; with: εx2 ∼ N (0, 0.1)
-# X3 ∼ N (1, 1)
-# 
-# Small confounding
-# A ∼ Bin(n, pa); with: logit(pa) = −2 + 0.25∗X1 + 0.5∗X3
-# Y ∼ Bin(n, py); with: logit(py) = −2 + A + 0.25∗X1
-# 
-# Medium confounding
-# A ∼ Bin(n, pa); with: logit(pa) = −2 + 0.25∗X1 + 0.5∗X3
-# Y ∼ Bin(n, py); with: logit(py) = −2 + A + 0.25∗X1 + 0.5∗X3
-# 
-# Large confounding
-# A ∼ Bin(n, pa); with: logit(pa) = −2 + 0.25∗X1 + 0.5∗X3 + 0.5∗X2
-# Y ∼ Bin(n, py); with: logit(py) = −2 + A + 0.25∗X1 + 0.75∗X3 + 0.75∗X2
-
 
 genData <- function(n, sen = "small") {
     u    <- rnorm(n, 1, 1)
@@ -294,7 +284,7 @@ doSimulation <- function(n, sen = "small") {
                      estATE = c(reg_adj[1], nonpar_gform[1], par_gform[1], IPW[1], DB_A[1], 
                                 DB_Y[1], DB_AY[1]),
                      trueRR = rep(trueRR, 7),
-                     max_biasRR = rep(max_bias_ATE, 7),
+                     max_biasRR = rep(max_bias_RR, 7),
                      estRR = c(reg_adj[2], nonpar_gform[2], par_gform[2], IPW[2], DB_A[2], 
                                 DB_Y[2], DB_AY[2]))
     return(df)
@@ -348,57 +338,6 @@ tab2 <- result_tab1 %>% select(scenario, method, trueRR_m, max_bias_estRR_m,
 
 library(xtable)
 xtable(tab1, digits = 5)
-
-
-#---------- Visualization
-
-# result_tab %>% gather(-c(method, scenario, iter, bias), value = "value", key = "type") %>%
-#     mutate(scenario = factor(scenario, levels = c("small", "medium", "large"))) %>%
-#     ggplot(aes(x = value, color = type)) +
-#     geom_density(alpha = 0.5, size = 1) +
-#     scale_color_manual(labels = c("Estimate ATE", "True ATE"),
-#                        values = c("#d7301f", "#2171b5")) +
-#     facet_grid(scenario ~ method) +
-#     labs(x = NULL, y = NULL, color = NULL) +
-#     theme_bw() +
-#     theme(
-#         legend.position = "top",
-#         legend.text = element_text(size = 14),
-#         strip.text = element_text(face = "bold", size = 14)
-#     ) -> result_plot
-# 
-# result_tab %>% gather(-c(method, scenario, iter, bias), value = "value", key = "type") %>%
-#     na.omit() %>% 
-#     mutate(scenario = factor(scenario, levels = c("small", "medium", "large"))) %>%
-#     ggplot(aes(x = value, fill = type)) +
-#     geom_histogram(position = position_dodge(), color = "white", alpha = 0.9) +
-#     scale_fill_manual(labels = c("Estimate ATE", "True ATE"),
-#                       values = c("#d7301f", "#2171b5")) +
-#     facet_grid(scenario ~ method) +
-#     labs(x = NULL, y = NULL, fill = NULL) +
-#     theme_bw() +
-#     theme(
-#         legend.position = "top",
-#         legend.text = element_text(size = 14),
-#         strip.text = element_text(face = "bold", size = 14)
-#     ) -> result_plot2
-# 
-# 
-# png("Fig1_result_plot.png", units="in", width = 16, height = 9, res = 300)
-# result_plot
-# dev.off()
-# 
-# png("Fig2_result_plot.png", units="in", width = 16, height = 9, res = 300)
-# result_plot2
-# dev.off()
-
-
-
-
-
-
-
-
-
+xtable(tab2, digits = 5)
 
 
